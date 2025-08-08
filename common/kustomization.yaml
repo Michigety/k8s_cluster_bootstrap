@@ -5,4 +5,5 @@ metadata:
   name: cluster-bootstrap-common
 
 resources:
+- application-mongo.yaml
 - application-postgres.yaml
