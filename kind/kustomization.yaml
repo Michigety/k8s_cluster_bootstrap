@@ -5,5 +5,5 @@ metadata:
   name: cluster-bootstrap-kind
 
 resources:
+- ../common
 # - ingress-nginx-application.yaml
-- postgres-application.yaml

@@ -1,14 +1,14 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: cluster-bootstrap-kind
+  name: cluster-bootstrap-baremetal
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://github.com/Michigety/k8s_cluster_bootstrap.git
     targetRevision: main
-    path: kind
+    path: baremetal
   destination:
     server: https://kubernetes.default.svc
     namespace: default
