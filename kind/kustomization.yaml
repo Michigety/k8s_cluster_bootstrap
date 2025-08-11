@@ -6,4 +6,4 @@ metadata:
 
 resources:
 - ../common
-# - ingress-nginx-application.yaml
+- ingress-nginx-application.yaml
