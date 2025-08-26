@@ -1,0 +1,80 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: istio-control-plane
+  namespace: monitoring # Prometheus Operator가 설치된 네임스페이스
+  labels:
+    release: prometheus # Prometheus Operator에서 사용하는 레이블에 맞춰 수정
+spec:
+  jobLabel: istio
+  selector:
+    matchLabels:
+      app: istiod
+  namespaceSelector:
+    matchNames:
+    - istio-system # Istio가 설치된 네임스페이스
+  endpoints:
+  - port: http-monitoring
+    interval: 15s
+---
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: istio-ztunnel
+  namespace: monitoring # Prometheus Operator가 설치된 네임스페이스
+  labels:
+    release: prometheus # 사용 중인 Prometheus Operator의 레이블 셀렉터와 일치시켜야 합니다.
+spec:
+  namespaceSelector:
+    matchNames:
+      - istio-system # ztunnel이 설치된 네임스페이스
+  selector:
+    matchLabels:
+      app: ztunnel # ztunnel Pod를 식별하는 기본 레이블
+  podMetricsEndpoints:
+  - port: ztunnel-stats # ztunnel의 메트릭 포트 (기본 15020)
+    path: /stats/prometheus
+    interval: 15s
+    relabelings:
+    - sourceLabels: [__meta_kubernetes_pod_node_name]
+      targetLabel: node_name
+---
+# apiVersion: monitoring.coreos.com/v1
+# kind: PodMonitor
+# metadata:
+#   name: istio-ambient-dataplane
+#   namespace: monitoring # Prometheus Operator가 설치된 네임스페이스
+#   labels:
+#     release: prometheus # Prometheus Operator에서 사용하는 레이블에 맞춰 수정
+# spec:
+#   selector:
+#     matchLabels:
+#       istio.io/dataplane-mode: none # Ambient Mesh 모드에서 사용하는 레이블
+#       # 또는
+#       # app: productpage
+#       # app: reviews
+#       # 등 Bookinfo 애플리케이션의 라벨을 사용할 수 있습니다.
+#   namespaceSelector:
+#     matchNames:
+#     - default # Bookinfo 애플리케이션이 위치한 네임스페이스
+#   podMetricsEndpoints:
+#   - port: metrics
+#     interval: 15s
+#     path: /stats/prometheus
+# ---
+# apiVersion: monitoring.coreos.com/v1
+# kind: PodMonitor
+# metadata:
+#   name: test
+#   namespace: monitoring # Prometheus Operator가 설치된 네임스페이스
+#   labels:
+#     release: prometheus # Prometheus Operator에서 사용하는 레이블에 맞춰 수정
+# spec:
+#   selector: {}
+#   namespaceSelector:
+#     matchNames:
+#     - default # Bookinfo 애플리케이션이 위치한 네임스페이스
+#   podMetricsEndpoints:
+#   - targetPort: 9080
+#     interval: 15s
+#     path: /metrics
